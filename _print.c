@@ -1,47 +1,61 @@
-Here is one way to rewrite the code to use _putchar instead of write:
-
-```c
 #include "main.h"
-#include <unistd.h>
+#include <stdio.h>
 
-void print_buffer(char buffer[], int *buff_ind);
-
-/** 
- * _printf - Printf function using _putchar 
- * @format: Format string
- * Return: Number of chars printed
- */
-int _printf(const char *format, ...) 
+/**
+ * Print_Buffer - Prints the contents of the buffer if it exists
+ * @buffer: Array of characters
+ * @buff_ind: Index at which to add next char, represents the length
+ */ 
+void Print_Buffer(char buffer[], int *buff_ind)
 {
-  va_list args;
-  int chars_printed = 0;
-  
-  va_start(args, format);
+    int i;
+    
+    if (*buff_ind > 0) 
+    {
+        for (i = 0; i < *buff_ind; i++) 
+        {
+            fputc(buffer[i], stdout); 
+        }
+    }  
 
-  for(int i = 0; format[i] != '\0'; i++) {
-    if(format[i] == '%') {
-      // Handle format specifiers
-    } else {
-      _putchar(format[i]);
-      chars_printed++;
-    }
-  }
-
-  va_end(args);
-
-  return chars_printed; 
+    *buff_ind = 0;
 }
 
 /**
- * print_buffer - Print buffer using _putchar
- * @buffer: Char array 
- * @buff_ind: Buffer index
-*/
-void print_buffer(char buffer[], int *buff_ind) 
+ * _Printf - Printf function using fputc for output
+ * @format: Format string
+ *
+ * Return: Number of characters printed
+ */
+int _Printf(const char *format, ...)
 {
-  for(int i = 0; i < *buff_ind; i++) {
-    _putchar(buffer[i]);
-  }
-  
-  *buff_ind = 0;
+    va_list args;
+    int i, chars_printed = 0;
+    char buffer[BUFF_SIZE]; 
+    int buff_index = 0;
+
+    va_start(args, format);
+
+    if (!format)
+        return -1;
+
+    for (i = 0; format[i]; i++)
+    {
+        if (format[i] != '%')
+        {
+            buffer[buff_index++] = format[i];
+            if (buff_index == BUFF_SIZE)
+                Print_Buffer(buffer, &buff_index);
+                
+            chars_printed++;
+        }
+        else
+        {
+             // Handle format specifiers
+        }
+    }
+
+    Print_Buffer(buffer, &buff_index);
+            
+    return chars_printed; 
 }
